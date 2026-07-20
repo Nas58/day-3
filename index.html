@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>7WC Interactive Floor Plan - Day 1</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
+        #map { height: 750px; width: 100%; border-radius: 10px; border: 4px solid #7a0019; background: #fff; }
+        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        button { padding: 12px 24px; cursor: pointer; background: #7a0019; color: #ffcc33; border: 2px solid #ffcc33; border-radius: 5px; font-weight: bold; }
+        button:hover { background: #5a0012; }
+
+        .umn-pin { background: none; border: none; }
+        .leaflet-popup-content-wrapper { max-width: 450px !important; padding: 5px; }
+        .leaflet-popup-content { font-size: 14px; line-height: 1.5; margin: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="loadMap('basement_3.png.png', 'basement')">Basement</button>
+    <button onclick="loadMap('first floor_3.png.png', 'first')">1st Floor</button>
+    <button onclick="loadMap('second floor_3.png.png', 'second')">2nd Floor</button>
+</div>
+<div id="map"></div>
+
+<script>
+    const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2, maxZoom: 1 });
+    let overlay = null;
+    let markers = L.layerGroup().addTo(map);
+
+    const pinIcon = L.divIcon({
+        className: 'umn-pin',
+        html: `<svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 0C6.716 0 0 6.716 0 15c0 10.312 15 27 15 27s15-16.688 15-27C30 6.716 23.284 0 15 0zm0 22c-3.866 0-7-3.134-7-7s3.134-7 7-7 7 3.134 7 7-3.134 7-7 7z" 
+                    fill="#7a0019" stroke="#ffcc33" stroke-width="2"/>
+               </svg>`,
+        iconSize: [30, 42],
+        iconAnchor: [15, 42],
+        popupAnchor: [0, -40]
+    });
+
+    const roomPins = {
+        basement: [
+            { pos: [435, 600], name: 'Rm. 25', info: '<strong>1:30pm:</strong> Concurrent Session: Public Interest Technology & Civic Leadership in the Age of AI.' },
+            { pos: [350, 635], name: 'Rm. 15', info: '<strong>1:30pm:</strong> Concurrent Session: Beyond the Visit: Cultivating Trust and Learning.' }
+        ],
+        first: [
+            { pos: [490, 510], name: 'Atrium (Rm. 101)', info: '<strong>7:30am:</strong> Check In & Registration, Breakfast and Networking.<br><strong>12:30pm:</strong> Buffet Lunch & Exhibition Hall / Vendors.' },
+            { pos: [375, 740], name: 'Cowles (Rm. 115)', info: '<strong>8:30am:</strong> Opening Ceremony (Sanda Ojiambo).<br><strong>9:15am:</strong> Keynote: Addressing Poverty and Inequality in South Africa.<br><strong>10:15am:</strong> Plenary: New Approaches in Examining Nervous Areas of Government.<br><strong>11:00am:</strong> Keynote (William A. Darity, Jr.) / Buildathon HHH40.<br><strong>1:30pm:</strong> Concurrent Session: Documenting Our History Preserving Our Culture.<br><strong>3:15pm:</strong> Closing Session & Ubuntu Futures Buildathon Showcase.' },
+            { pos: [100, 600], name: 'Humphrey Forum (Rm. 105)', info: '<strong>12:30pm:</strong> Buffet Lunch.' },
+            { pos: [715, 500], name: 'Josie Johnson (Rm. 180)', info: '<strong>1:30pm:</strong> Concurrent Session: Documenting Our History Preserving Our Culture.' }
+        ],
+        second: [
+            { pos: [350, 720], name: 'Wilkins (Rm. 215)', info: '<strong>1:30pm:</strong> Concurrent Session: Leadership and Democracy Building - Boards and Commissions.' }
+        ]
+    };
+
+    function loadMap(imageName, floorKey) {
+        if (overlay) map.removeLayer(overlay);
+        markers.clearLayers();
+        let bounds = [[0, 0], [900, 1200]];
+        overlay = L.imageOverlay(imageName, bounds).addTo(map);
+        map.fitBounds(bounds);
+        roomPins[floorKey].forEach(pin => {
+            L.marker(pin.pos, { icon: pinIcon })
+             .addTo(markers)
+             .bindPopup(`<h3>${pin.name}</h3><p>${pin.info}</p>`);
+        });
+    }
+
+    // Default load
+    loadMap('first floor_3.png.png', 'first');
+</script>
+</body>
+</html>
